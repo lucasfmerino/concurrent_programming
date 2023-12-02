@@ -1,5 +1,6 @@
 package Client;
 
+import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -10,9 +11,14 @@ public class ClientTasks {
         
         System.out.println("Conexão estabelecida");
 
+        PrintStream output = new PrintStream(socket.getOutputStream());
+        output.println("c1");
+
         Scanner keyboard = new Scanner(System.in);
         keyboard.nextLine();
 
+        output.close();
+        keyboard.close();
         socket.close();
     }
 }

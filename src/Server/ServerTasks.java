@@ -15,6 +15,7 @@ public class ServerTasks {
 
             DistributeTasks distributeTasks = new DistributeTasks(socket);
             Thread threadClient = new Thread(distributeTasks);
+            threadClient.start();
 
         }
         
