@@ -12,6 +12,10 @@ public class ServerTasks {
         while(true) {
             Socket socket = server.accept();
             System.out.println("Aceitando novo cliente na porta " + socket.getPort());
+
+            DistributeTasks distributeTasks = new DistributeTasks(socket);
+            Thread threadClient = new Thread(distributeTasks);
+
         }
         
     }
