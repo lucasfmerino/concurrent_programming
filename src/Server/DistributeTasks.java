@@ -1,5 +1,6 @@
 package Server;
 
+import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -17,14 +18,34 @@ public class DistributeTasks implements Runnable {
 
             System.out.println("Distribuindo tarefas para" + socket);
 
-            Scanner inputClient = new Scanner(socket.getInputStream());
+            Scanner clientInput = new Scanner(socket.getInputStream());
 
-            while(inputClient.hasNextLine()) {
-                String command = inputClient.nextLine();
-                System.out.println(command);
+            PrintStream clientOutput = new PrintStream(socket.getOutputStream());
+
+            while (clientInput.hasNextLine()) {
+                String command = clientInput.nextLine();
+                System.out.println("[" + socket.getPort() + "]: " + command);
+
+                switch (command) {
+                    case "c1": {
+                        clientOutput.println("Command c1 confirmation");
+                        break;
+                    }
+
+                    case "c2": {
+                        clientOutput.println("Command c2 confirmation");
+                        break;
+                    }
+
+                    default:
+                        clientOutput.println("Command: " + command + " not found.");
+                        break;
+                }
+
             }
 
-            inputClient.close();
+            clientOutput.close();
+            clientInput.close();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
