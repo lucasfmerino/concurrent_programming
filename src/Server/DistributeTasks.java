@@ -7,9 +7,11 @@ import java.util.Scanner;
 public class DistributeTasks implements Runnable {
 
     private Socket socket;
+    private ServerTasks server;
 
-    public DistributeTasks(Socket socket) {
+    public DistributeTasks(Socket socket, ServerTasks server) {
         this.socket = socket;
+        this.server = server;
     }
 
     @Override
@@ -34,6 +36,12 @@ public class DistributeTasks implements Runnable {
 
                     case "c2": {
                         clientOutput.println("Command c2 confirmation");
+                        break;
+                    }
+
+                    case "close server": {
+                        clientOutput.println("Shutting down the server.");
+                        server.stopServer();
                         break;
                     }
 

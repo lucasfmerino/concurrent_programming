@@ -1,31 +1,54 @@
 package Server;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerTasks {
+
+    private ExecutorService threadPool;
+    private ServerSocket server;
+    private boolean running;
+
+    public ServerTasks() throws IOException {
+        System.out.println(" --- Iniciando Servidor --- ");
+        this.server = new ServerSocket(12345);
+        this.threadPool = Executors.newCachedThreadPool();
+        this.running = true;
+    }
+
     public static void main(String[] args) throws Exception {
-    
-        System.out.println("--- INCIANDO SERVIDOR ---");
-        ServerSocket server = new ServerSocket(12345);
 
-        // ExecutorService threadPool = Executors.newFixedThreadPool(2);
-        ExecutorService threadPool = Executors.newCachedThreadPool();
-        
+        ServerTasks server = new ServerTasks();
+        server.startServer();
+        server.stopServer();
 
-        while(true) {
-            Socket socket = server.accept();
-            System.out.println("Aceitando novo cliente na porta " + socket.getPort());
+    }
 
-            DistributeTasks distributeTasks = new DistributeTasks(socket);
+    public void startServer() throws IOException {
+        while (running) {
+            try {
+                Socket socket = server.accept();
+                System.out.println("Aceitando novo cliente na porta " + socket.getPort());
 
-            // Thread threadClient = new Thread(distributeTasks);
-            // threadClient.start();
+                DistributeTasks distributeTasks = new DistributeTasks(socket, this);
+                threadPool.execute(distributeTasks);
 
-            threadPool.execute(distributeTasks);
+            } catch (SocketException e) {
+                System.out.println("SocketException. Running: " + this.running);
+            }
+
         }
-        
+
+    }
+
+    public void stopServer() throws IOException {
+        running = false;
+        server.close();
+        threadPool.shutdown();
+
     }
 }
