@@ -18,7 +18,7 @@ public class ServerTasks {
     public ServerTasks() throws IOException {
         System.out.println(" --- Iniciando Servidor --- ");
         this.server = new ServerSocket(12345);
-        this.threadPool = Executors.newCachedThreadPool();
+        this.threadPool = Executors.newFixedThreadPool(4, new CustomThreadFactory());
         this.running = new AtomicBoolean(true);
     }
 
