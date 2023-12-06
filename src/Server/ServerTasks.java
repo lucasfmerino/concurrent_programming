@@ -6,18 +6,20 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerTasks {
 
     private ExecutorService threadPool;
     private ServerSocket server;
-    private boolean running;
+    // private volatile boolean running;
+    private AtomicBoolean running;
 
     public ServerTasks() throws IOException {
         System.out.println(" --- Iniciando Servidor --- ");
         this.server = new ServerSocket(12345);
         this.threadPool = Executors.newCachedThreadPool();
-        this.running = true;
+        this.running = new AtomicBoolean(true);
     }
 
     public static void main(String[] args) throws Exception {
@@ -29,12 +31,12 @@ public class ServerTasks {
     }
 
     public void startServer() throws IOException {
-        while (running) {
+        while (this.running.get()) {
             try {
                 Socket socket = server.accept();
                 System.out.println("Aceitando novo cliente na porta " + socket.getPort());
 
-                DistributeTasks distributeTasks = new DistributeTasks(socket, this);
+                DistributeTasks distributeTasks = new DistributeTasks(threadPool, socket, this);
                 threadPool.execute(distributeTasks);
 
             } catch (SocketException e) {
@@ -46,7 +48,8 @@ public class ServerTasks {
     }
 
     public void stopServer() throws IOException {
-        running = false;
+        // running = false;
+        this.running.set(false);
         server.close();
         threadPool.shutdown();
 

@@ -3,15 +3,18 @@ package Server;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 
 public class DistributeTasks implements Runnable {
 
     private Socket socket;
     private ServerTasks server;
+    private ExecutorService threadPool;
 
-    public DistributeTasks(Socket socket, ServerTasks server) {
+    public DistributeTasks(ExecutorService threadPool, Socket socket, ServerTasks server) {
         this.socket = socket;
         this.server = server;
+        this.threadPool = threadPool;
     }
 
     @Override
@@ -31,17 +34,22 @@ public class DistributeTasks implements Runnable {
                 switch (command) {
                     case "c1": {
                         clientOutput.println("Command c1 confirmation");
+                        CommandC1 c1 = new CommandC1(clientOutput);
+                        this.threadPool.execute(c1);
                         break;
                     }
 
                     case "c2": {
                         clientOutput.println("Command c2 confirmation");
+                        CommandC2 c2 = new CommandC2(clientOutput);
+                        this.threadPool.execute(c2);
                         break;
                     }
 
                     case "close server": {
                         clientOutput.println("Shutting down the server.");
                         server.stopServer();
+                        // System.exit(0);
                         break;
                     }
 
