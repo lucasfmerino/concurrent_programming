@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public class DistributeTasks implements Runnable {
 
@@ -41,8 +42,13 @@ public class DistributeTasks implements Runnable {
 
                     case "c2": {
                         clientOutput.println("Command c2 confirmation");
-                        CommandC2 c2 = new CommandC2(clientOutput);
-                        this.threadPool.execute(c2);
+                        CommandC2CallWS c2WS = new CommandC2CallWS(clientOutput);
+                        CommandC2Database c2DB = new CommandC2Database(clientOutput);
+                        Future<String> futureWS = this.threadPool.submit(c2WS);
+                        Future<String> futureDB = this.threadPool.submit(c2DB);
+
+                        this.threadPool.submit(new FinalResult(futureWS, futureDB, clientOutput));
+
                         break;
                     }
 
